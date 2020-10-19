@@ -21,7 +21,7 @@ services:
     privatekey: classpath:testprivatekey.pem
     certificate: classpath:testpublickey.pem
     privatekey-password: testpass
-    batch-id: ${K8S_POD_NAME}
+    batch-id: ${POD_NAME}
     efgs-transmission:
       enable-dsos: true
       enable-report-type: true
