@@ -16,7 +16,16 @@ public class UploadServiceConfig {
   private String certificate;
   private Signature signature;
   private TestData testData;
+  private String batchId;
   private EfgsTransmission efgsTransmission;
+
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
+  }
 
   public EfgsTransmission getEfgsTransmission() {
     return efgsTransmission;

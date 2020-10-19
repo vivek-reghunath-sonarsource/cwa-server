@@ -4,6 +4,7 @@ package app.coronawarn.server.services.federation.upload.payload;
 
 import app.coronawarn.server.common.persistence.domain.FederationUploadKey;
 import app.coronawarn.server.common.protocols.external.exposurenotification.DiagnosisKeyBatch;
+import app.coronawarn.server.services.federation.upload.config.UploadServiceConfig;
 import app.coronawarn.server.services.federation.upload.payload.signing.BatchSigner;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -29,10 +30,18 @@ public class PayloadFactory {
 
   private final DiagnosisKeyBatchAssembler assembler;
   private final BatchSigner signer;
+  private final String batchId;
 
-  public PayloadFactory(DiagnosisKeyBatchAssembler assembler, BatchSigner signer) {
+  /**
+   * PayloadFactory.
+   * @param assembler .
+   * @param signer .
+   * @param config .
+   */
+  public PayloadFactory(DiagnosisKeyBatchAssembler assembler, BatchSigner signer, UploadServiceConfig config) {
     this.assembler = assembler;
     this.signer = signer;
+    this.batchId = config.getBatchId();
   }
 
   private UploadPayload mapToPayloadAndSign(String batchTag, DiagnosisKeyBatch batch,
@@ -49,13 +58,13 @@ public class PayloadFactory {
     return payload;
   }
 
-  private String generateBatchTag(int counter, byte[] runnerHash) {
+  private String generateBatchTag(int counter) {
     var currentTime = LocalDateTime.now(ZoneOffset.UTC);
-    return String.format("%d-%d-%d-%s-%d",
+    return String.format("%d-%d-%d_%s_%d",
         currentTime.getYear(),
         currentTime.getMonth().getValue(),
         currentTime.getDayOfMonth(),
-        Base64.encodeBase64String(runnerHash),
+        this.batchId,
         counter);
   }
 
@@ -69,13 +78,11 @@ public class PayloadFactory {
   public List<UploadPayload> makePayloadList(List<FederationUploadKey> diagnosisKeys) {
     Map<DiagnosisKeyBatch, List<FederationUploadKey>> batchesAndOriginalKeys = assembler
         .assembleDiagnosisKeyBatch(diagnosisKeys);
-    byte[] hash = new byte[4];
-    new SecureRandom().nextBytes(hash);
     AtomicInteger batchCounter = new AtomicInteger(0);
 
     return batchesAndOriginalKeys.entrySet().stream()
         .map(entry -> this.mapToPayloadAndSign(
-            generateBatchTag(batchCounter.getAndIncrement(), hash),
+            generateBatchTag(batchCounter.getAndIncrement()),
             entry.getKey(),
             entry.getValue()))
         .collect(Collectors.toList());
