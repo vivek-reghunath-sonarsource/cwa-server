@@ -8,14 +8,13 @@ import app.coronawarn.server.services.federation.upload.config.UploadServiceConf
 import app.coronawarn.server.services.federation.upload.payload.signing.BatchSigner;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.slf4j.Logger;
@@ -34,9 +33,10 @@ public class PayloadFactory {
 
   /**
    * PayloadFactory.
+   *
    * @param assembler .
-   * @param signer .
-   * @param config .
+   * @param signer    .
+   * @param config    .
    */
   public PayloadFactory(DiagnosisKeyBatchAssembler assembler, BatchSigner signer, UploadServiceConfig config) {
     this.assembler = assembler;
@@ -64,7 +64,7 @@ public class PayloadFactory {
         currentTime.getYear(),
         currentTime.getMonth().getValue(),
         currentTime.getDayOfMonth(),
-        this.batchId,
+        StringUtils.substringAfter(this.batchId, "-"),
         counter);
   }
 
