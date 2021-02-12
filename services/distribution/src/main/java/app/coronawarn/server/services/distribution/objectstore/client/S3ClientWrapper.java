@@ -60,9 +60,10 @@ public class S3ClientWrapper implements ObjectStoreClient {
       s3Client.listObjectsV2(ListObjectsV2Request.builder().bucket(bucketName).maxKeys(1).build());
       return true;
     } catch (NoSuchBucketException e) {
+      logger.debug("No such bucket exception for bucket: " + bucketName);
       return false;
     } catch (SdkException e) {
-      throw new ObjectStoreOperationFailedException("Failed to determine if bucket exists.", e);
+      throw new ObjectStoreOperationFailedException("Failed to determine if bucket exists. For bucket with name "+bucketName, e);
     }
   }
 
