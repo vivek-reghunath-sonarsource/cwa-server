@@ -5,8 +5,8 @@ import static java.util.stream.Collectors.toList;
 
 import app.coronawarn.server.services.distribution.statistics.exceptions.NotModifiedException;
 import app.coronawarn.server.services.distribution.statistics.file.JsonFile;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,13 +67,12 @@ public class S3ClientWrapper implements ObjectStoreClient {
   }
 
   private JsonFile fromResponse(ResponseInputStream<GetObjectResponse> response) {
-    ByteArrayInputStream byteArrayInputStream = null;
-    try {
-      byteArrayInputStream = new ByteArrayInputStream(response.readAllBytes());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return new JsonFile(byteArrayInputStream, response.response().eTag());
+    StringBuilder builder = new StringBuilder();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(response));
+    reader.lines()
+        .map(String::strip)
+        .forEach(builder::append);
+    return new JsonFile(builder.toString(), response.response().eTag());
   }
 
   @Override
@@ -89,7 +88,6 @@ public class S3ClientWrapper implements ObjectStoreClient {
     var object = s3Client.getObject(request);
     return fromResponse(object);
   }
-
 
   @Override
   @Retryable(

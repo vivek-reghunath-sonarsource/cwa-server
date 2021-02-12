@@ -16,7 +16,6 @@ import app.coronawarn.server.services.distribution.statistics.keyfigurecard.KeyF
 import app.coronawarn.server.services.distribution.statistics.keyfigurecard.factory.MissingPropertyException;
 import app.coronawarn.server.services.distribution.statistics.validation.StatisticsJsonValidator;
 import app.coronawarn.server.services.distribution.utils.SerializationUtils;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -100,7 +99,7 @@ public class StatisticsToProtobufMapping {
             .addAllKeyFigureCards(buildAllKeyFigureCards(jsonStringObjects))
             .build();
       }
-    } catch (BucketNotFoundException | ConnectionException | FilePathNotFoundException | IOException ex) {
+    } catch (BucketNotFoundException | ConnectionException | FilePathNotFoundException ex) {
       logger.error("Statistics file not generated!", ex);
       return Statistics.newBuilder().build();
     }

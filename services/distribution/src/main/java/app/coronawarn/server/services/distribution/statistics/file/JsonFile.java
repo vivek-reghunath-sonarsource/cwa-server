@@ -1,29 +1,27 @@
 package app.coronawarn.server.services.distribution.statistics.file;
 
-import java.io.InputStream;
-
 public class JsonFile {
-  private InputStream content;
+  private String content;
   private String etag;
 
-  public JsonFile(final InputStream content, final String etag) {
+  public JsonFile(String content, String etag) {
     this.content = content;
     this.etag = etag;
   }
 
-  public InputStream getContent() {
+  public String getContent() {
     return content;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
   }
 
   public String getETag() {
     return etag;
   }
 
-  public void setContent(final InputStream content) {
-    this.content = content;
-  }
-
-  public void setETag(final String etag) {
+  public void setETag(String etag) {
     this.etag = etag;
   }
 }

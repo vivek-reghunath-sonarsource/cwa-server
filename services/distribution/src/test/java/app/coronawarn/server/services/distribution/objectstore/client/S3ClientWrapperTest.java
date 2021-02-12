@@ -1,9 +1,12 @@
+
+
 package app.coronawarn.server.services.distribution.objectstore.client;
 
 import static java.util.Collections.EMPTY_MAP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.util.Maps.newHashMap;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -14,12 +17,12 @@ import static org.mockito.Mockito.when;
 
 import app.coronawarn.server.services.distribution.config.DistributionServiceConfig;
 import app.coronawarn.server.services.distribution.objectstore.client.ObjectStoreClient.HeaderKey;
-import app.coronawarn.server.services.distribution.statistics.exceptions.NotModifiedException;
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import app.coronawarn.server.services.distribution.statistics.exceptions.NotModifiedException;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -306,7 +309,7 @@ class S3ClientWrapperTest {
   }
 
   @Test
-  void getSingleObjectContent() throws Exception {
+  void getSingleObjectContent() {
     GetObjectResponse response = GetObjectResponse.builder()
         .eTag("abc")
         .build();
@@ -314,18 +317,18 @@ class S3ClientWrapperTest {
     when(s3Client.getObject(any(GetObjectRequest.class))).thenReturn(httpResponse);
     var jsonFile = s3ClientWrapper.getSingleObjectContent("example", "key1");
     assertThat(jsonFile.getETag()).isEqualTo("abc");
-    assertThat(new String(jsonFile.getContent().readAllBytes())).isEqualTo("[]");
+    assertThat(jsonFile.getContent()).isEqualTo("[]");
   }
 
   @Test
-  void jsonFileEtagIsNullWhenNotReceived() throws Exception {
+  void jsonFileEtagIsNullWhenNotReceived() {
     GetObjectResponse response = GetObjectResponse.builder()
         .build();
     var httpResponse = makeGetObjectStreamedResponse(response, "[]");
     when(s3Client.getObject(any(GetObjectRequest.class))).thenReturn(httpResponse);
     var jsonFile = s3ClientWrapper.getSingleObjectContent("example", "key1");
     assertThat(jsonFile.getETag()).isNull();
-    assertThat(new String(jsonFile.getContent().readAllBytes())).isEqualTo("[]");
+    assertThat(jsonFile.getContent()).isEqualTo("[]");
   }
 
   @ParameterizedTest
@@ -338,7 +341,7 @@ class S3ClientWrapperTest {
   }
 
   @Test
-  void shouldReturnNewObjectIfEtagDoesntMatch() throws Exception {
+  void shouldReturnNewObjectIfEtagDoesntMatch() throws NotModifiedException {
     GetObjectResponse response = GetObjectResponse.builder()
         .eTag("abc")
         .build();
@@ -346,7 +349,7 @@ class S3ClientWrapperTest {
     when(s3Client.getObject(any(GetObjectRequest.class))).thenReturn(httpResponse);
     var jsonFile = s3ClientWrapper.getSingleObjectContent("example", "key1", "cba");
     assertThat(jsonFile.getETag()).isEqualTo("abc");
-    assertThat(new String(jsonFile.getContent().readAllBytes())).isEqualTo("[]");
+    assertThat(jsonFile.getContent()).isEqualTo("[]");
   }
 
   @Test
