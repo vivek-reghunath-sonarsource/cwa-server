@@ -56,14 +56,17 @@ public class S3ClientWrapper implements ObjectStoreClient {
   @Override
   public boolean bucketExists(String bucketName) {
     try {
+      logger.info("Trying to list objects for bucket: " + bucketName);
       // using S3Client.listObjectsV2 instead of S3Client.listBuckets/headBucket in order to limit required permissions
       s3Client.listObjectsV2(ListObjectsV2Request.builder().bucket(bucketName).maxKeys(1).build());
       return true;
     } catch (NoSuchBucketException e) {
-      logger.debug("No such bucket exception for bucket: " + bucketName);
+      logger.info("No such bucket exception for bucket: " + bucketName);
       return false;
     } catch (SdkException e) {
-      throw new ObjectStoreOperationFailedException("Failed to determine if bucket exists. For bucket with name "+bucketName, e);
+      logger.info("Failed to determine if bucket exists: " + bucketName);
+      throw new ObjectStoreOperationFailedException(
+          "Failed to determine if bucket exists. For bucket with name " + bucketName, e);
     }
   }
 
