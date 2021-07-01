@@ -4,6 +4,7 @@ package app.coronawarn.server.services.distribution;
 
 import app.coronawarn.server.services.distribution.config.DistributionServiceConfig;
 import app.coronawarn.server.services.distribution.config.DistributionServiceConfigValidator;
+import feign.Retryer;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
@@ -57,8 +58,14 @@ public class Application implements EnvironmentAware, DisposableBean {
     return new DistributionServiceConfigValidator();
   }
 
+  @Bean
+  public Retryer retryer() {
+    return new Retryer.Default();
+  }
+
   /**
    * Terminates this application with exit code 1 (general error).
+   *
    * @param appContext type ApplicationContext
    */
   public static void killApplication(ApplicationContext appContext) {
