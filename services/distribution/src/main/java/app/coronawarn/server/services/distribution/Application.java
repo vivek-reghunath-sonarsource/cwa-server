@@ -58,11 +58,6 @@ public class Application implements EnvironmentAware, DisposableBean {
     return new DistributionServiceConfigValidator();
   }
 
-  @Bean
-  public Retryer retryer() {
-    return new Retryer.Default();
-  }
-
   /**
    * Terminates this application with exit code 1 (general error).
    *

@@ -27,10 +27,6 @@ public class DigitalCovidCertificateRetryMechanismTest extends BaseS3Integration
   @Test
   public void testCustomRetryConfigByErrorDecoder() throws IOException, DigitalCovidCertificateException {
 
-    when(digitalCovidCertificateClient.getCountryRuleByHash(any(), any())).thenReturn(
-        Response.builder().status(503).build(),
-        Response.builder().status(200).build());
-
     class RetryOn503ConflictStatus extends RetryMechanismDecoder.Default {
 
       @Override
@@ -41,4 +37,5 @@ public class DigitalCovidCertificateRetryMechanismTest extends BaseS3Integration
           return super.decode(methodKey, response);
       }
     }
+  }
 }
