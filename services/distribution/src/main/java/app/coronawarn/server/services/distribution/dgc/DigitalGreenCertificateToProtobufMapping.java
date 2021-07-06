@@ -8,6 +8,7 @@ import app.coronawarn.server.common.shared.exception.UnableToLoadFileException;
 import app.coronawarn.server.services.distribution.config.DistributionServiceConfig;
 import app.coronawarn.server.services.distribution.config.DistributionServiceConfig.DigitalGreenCertificate;
 import app.coronawarn.server.services.distribution.dgc.client.DigitalCovidCertificateClient;
+import app.coronawarn.server.services.distribution.dgc.exception.DigitalCovidCertificateException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -173,12 +174,15 @@ public class DigitalGreenCertificateToProtobufMapping {
    */
   private ValueSet read(String valueSetId, ConfigValueProvider configGetter, String valueSetDefaultPath)
       throws UnableToLoadFileException {
-    Optional<ValueSet> result = getValueSet(valueSetId).or(() -> {
+    Optional<ValueSet> result = getValueSet(valueSetId);
+
+    if (result.isEmpty()) {
       String path = configGetter.getPath(distributionServiceConfig.getDigitalGreenCertificate());
       return readConfiguredJsonOrDefault(resourceLoader, path, valueSetDefaultPath,
           ValueSet.class);
-    });
-    return result.orElseThrow(() -> new UnableToLoadFileException(valueSetDefaultPath));
+    }
+
+    return result.get();
   }
 
   /**
@@ -188,10 +192,16 @@ public class DigitalGreenCertificateToProtobufMapping {
    * @return The ValueSet or empty.
    */
   private Optional<ValueSet> getValueSet(String valueSetId) {
-    Optional<String> hash = getValueSetHash(valueSetId);
-    if (hash.isPresent()) {
-      return dccClient.getValueSet(hash.get());
+    Optional<String> hash;
+    try {
+      hash = getValueSetHash(valueSetId);
+      if (hash.isPresent()) {
+        return dccClient.getValueSet(hash.get());
+      }
+    } catch (DigitalCovidCertificateException e) {
+      return Optional.empty();
     }
+
     return Optional.empty();
   }
 
@@ -200,7 +210,7 @@ public class DigitalGreenCertificateToProtobufMapping {
    * @param valueSetId The valueSetId to get the hash for.
    * @return The hash as contained in the metadata or empty.
    */
-  private Optional<String> getValueSetHash(String valueSetId) {
+  private Optional<String> getValueSetHash(String valueSetId) throws DigitalCovidCertificateException {
     if (metadata == null) {
       metadata = dccClient.getValueSets();
       if (metadata == null) {
