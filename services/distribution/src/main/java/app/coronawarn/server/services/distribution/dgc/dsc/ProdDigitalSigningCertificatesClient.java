@@ -2,7 +2,9 @@ package app.coronawarn.server.services.distribution.dgc.dsc;
 
 import app.coronawarn.server.services.distribution.dgc.Certificates;
 import app.coronawarn.server.services.distribution.dgc.dsc.decode.DscListDecoder;
+import app.coronawarn.server.services.distribution.dgc.exception.DscListDecodeException;
 import app.coronawarn.server.services.distribution.dgc.exception.FetchDscTrustListException;
+import feign.FeignException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +33,13 @@ public class ProdDigitalSigningCertificatesClient implements DigitalSigningCerti
 
   @Override
   public Optional<Certificates> getDscTrustList() throws FetchDscTrustListException {
-    logger.debug("Get rules from DCC");
+    logger.debug("Get trust list from DSC");
     try {
       return Optional.of(dscListDecoder.decode(digitalSigningCertificatesFeignClient.getDscTrustList().getBody()));
-    } catch (Exception e) {
-      throw new FetchDscTrustListException("DSC Trust List could not be fetched because of: ", e);
+    } catch (FeignException e) {
+      throw new FetchDscTrustListException("DSC Trust List could not be fetched because of: " + e.getMessage(), e);
+    } catch (DscListDecodeException e) {
+      throw new FetchDscTrustListException("DSC Trust List could not decode because of: " + e.getMessage(), e);
     }
   }
 }
