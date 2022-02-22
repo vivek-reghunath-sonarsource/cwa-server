@@ -56,6 +56,7 @@ import app.coronawarn.server.services.distribution.config.DistributionServiceCon
 import com.google.protobuf.ByteString;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -547,7 +548,7 @@ public class ApplicationConfigurationV2PublicationConfig {
             .addAllBlockedUvciChunks(buildBlockedUvciChunks(distributionServiceConfig.getAppConfigParameters()
                 .getDgcParameters().getBlockListParameters().getBlockedUvciChunks()))
             .build())
-        .setReissueServicePublicKeyDigest(ByteString.copyFromUtf8(serviceKeyDigest))
+        .setReissueServicePublicKeyDigest(ByteString.copyFrom(Hex.decode(serviceKeyDigest)))
         .build();
   }
 
