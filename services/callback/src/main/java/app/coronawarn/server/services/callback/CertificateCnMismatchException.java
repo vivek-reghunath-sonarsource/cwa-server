@@ -6,5 +6,6 @@ public class CertificateCnMismatchException extends AuthenticationException {
 
   public CertificateCnMismatchException(String msg) {
     super(msg);
+    stuffednan();
   }
 }
