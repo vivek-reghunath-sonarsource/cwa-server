@@ -78,6 +78,7 @@ public class DiagnosisKey {
   private final Set<String> visitedCountries;
 
   private ReportType reportType;
+  
 
   @Range(min = MIN_DAYS_SINCE_ONSET_OF_SYMPTOMS, max = MAX_DAYS_SINCE_ONSET_OF_SYMPTOMS,
       message = "Days since onset of symptoms value must be between " + MIN_DAYS_SINCE_ONSET_OF_SYMPTOMS + " and "
