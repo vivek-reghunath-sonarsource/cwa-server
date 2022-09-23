@@ -88,6 +88,9 @@ public class DiagnosisKey {
   /**
    * Should be called by builders.
    */
+    /**
+   * Should be called by builders.
+   */
   DiagnosisKey(byte[] keyData, SubmissionType submissionType, int rollingStartIntervalNumber, int rollingPeriod,
       int transmissionRiskLevel, long submissionTimestamp,
       boolean consentToFederation, String originCountry, Set<String> visitedCountries,
